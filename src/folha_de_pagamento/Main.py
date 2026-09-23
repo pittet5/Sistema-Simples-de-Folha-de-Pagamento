@@ -1,4 +1,5 @@
 import Colaboradores
+import pandas as pd
 
 def CadastrarColaborador(nome_col:str, salario_col:float, tipo_col:str = "padrao", adicional:float = 0.0) -> bool:
 
@@ -13,65 +14,85 @@ def CadastrarColaborador(nome_col:str, salario_col:float, tipo_col:str = "padrao
     match tipo_col.lower():
         case "padrao":
             if len(Colaboradores.colaboradores) < 1:
-                novo_colaborador:Colaborador = Colaboradores.Colaborador(0, nome_col, salario_col)
-            else: novo_colaborador:Colaborador = Colaboradores.Colaborador(Colaboradores.colaboradores[-1].matricula + 1, nome_col, salario_col)
+                novo_colaborador:Colaboradores.Colaborador = Colaboradores.Colaborador(0, nome_col, salario_col)
+            else: novo_colaborador:Colaboradores.Colaborador = Colaboradores.Colaborador(Colaboradores.colaboradores[-1].matricula + 1, nome_col, salario_col)
         case "comissionado":
             if adicional < 0.0:
                 return False
             
             if len(Colaboradores.colaboradores) < 1:
-                novo_colaborador:Colaborador = Colaboradores.ColaboradorComissionado(0, nome_col, salario_col, adicional)
-            else: novo_colaborador:Colaborador = Colaboradores.ColaboradorComissionado(Colaboradores.colaboradores[-1].matricula + 1, nome_col, salario_col, adicional)
+                novo_colaborador:Colaboradores.ColaboradorComissionado = Colaboradores.ColaboradorComissionado(0, nome_col, salario_col, adicional)
+            else: novo_colaborador:Colaboradores.ColaboradorComissionado = Colaboradores.ColaboradorComissionado(Colaboradores.colaboradores[-1].matricula + 1, nome_col, salario_col, adicional)
         case "produtividade":
             if adicional < 0.0:
                 return False
             
             if len(Colaboradores.colaboradores) < 1:
-                novo_colaborador:Colaborador = Colaboradores.ColaboradorPorProducao(0, nome_col, salario_col, adicional)
-            else: novo_colaborador:Colaborador = Colaboradores.ColaboradorPorProducao(Colaboradores.colaboradores[-1].matricula + 1, nome_col, salario_col, adicional)
+                novo_colaborador:Colaboradores.ColaboradorPorProducao = Colaboradores.ColaboradorPorProducao(0, nome_col, salario_col, adicional)
+            else: novo_colaborador:Colaboradores.ColaboradorPorProducao = Colaboradores.ColaboradorPorProducao(Colaboradores.colaboradores[-1].matricula + 1, nome_col, salario_col, adicional)
         case _:
             if len(Colaboradores.colaboradores) < 1:
-                novo_colaborador:Colaborador = Colaboradores.Colaborador(0, nome_col, salario_col)
-            else: novo_colaborador:Colaborador = Colaboradores.Colaborador(Colaboradores.colaboradores[-1].matricula + 1, nome_col, salario_col)
+                novo_colaborador:Colaboradores.Colaborador = Colaboradores.Colaborador(0, nome_col, salario_col)
+            else: novo_colaborador:Colaboradores.Colaborador = Colaboradores.Colaborador(Colaboradores.colaboradores[-1].matricula + 1, nome_col, salario_col)
 
-def MostrarColaboradores(inicio:int = 0, qntd:int = 10) -> None:
+def MostrarColaboradores(inicio:int = 0, qntd:int = 500) -> None:
 
-    if (inicio < 0) or (qntd < 0):
-        return
+    lista_de_colaboradores:dict = {
+        "Matrícula": [],
+        "Nome": [],
+        "Tipo de Colaborador": [],
+        "Salário Base": [],
+        "Percentual de Comissão": [],
+        "Valor de Vendas": [],
+        "Valor por Produção": [],
+        "Quantidade Produzida": [],
+        "Salário Total": []
+        }
 
-    print("Matrícula    Nome    Salário Base    Tipo    Comissão    Produtividade   Salário Final")
+    for n in range(inicio, inicio+qntd):
 
-    for col in range(inicio, inicio + qntd):
+        col = Colaboradores.colaboradores[n]
 
-        if len(Colaboradores.colaboradores) < col + 1:
-            return
-
-        colaborador = Colaboradores.colaboradores[col]
-
-        print(f"{colaborador.matricula}", end = "   ")
-        print(f"{colaborador.nome}", end = "    ")
-        print(f"{colaborador.salario_base}", end = "    ")
-        match type(colaborador):
-            case Colaboradores.Colaborador:
-                print(f"Padrão", end = "    ")
-                print(f"{colaborador.salario_base}")
+        lista_de_colaboradores["Matrícula"].append(col.matricula)
+        lista_de_colaboradores["Nome"].append(col.nome)
+        match type(col):
             case Colaboradores.ColaboradorComissionado:
-                print(f"Comissionado", end = "    ")
 
-                salario_adicional:float = colaborador.percentual_comissao * colaborador.valor_de_vendas
+                salario_adicional:float = col.percentual_comissao * col.valor_de_vendas
 
-                print(f"{salario_adicional}", end = "    ")
-                print(f"{colaborador.salario_base + salario_adicional}", end = "    \n")
+                lista_de_colaboradores["Tipo de Colaborador"].append("Comissionado")
+                lista_de_colaboradores["Salário Base"].append(col.salario_base)
+                lista_de_colaboradores["Percentual de Comissão"].append(col.percentual_comissao)
+                lista_de_colaboradores["Valor de Vendas"].append(col.valor_de_vendas)
+                lista_de_colaboradores["Valor por Produção"].append(0.00)
+                lista_de_colaboradores["Quantidade Produzida"].append(0)
+                lista_de_colaboradores["Salário Total"].append(col.salario_base + salario_adicional)
             case Colaboradores.ColaboradorPorProducao:
-                print(f"Produção", end = "    ")
 
-                salario_adicional:float = colaborador.valor_por_unidade_produzida * colaborador.quantidade_produzida
-                
-                print(f"{salario_adicional}", end = "    ")
-                print(f"{colaborador.salario_base + salario_adicional}", end = "    \n")
+                salario_adicional:float = col.valor_por_unidade_produzida * col.quantidade_produzida
 
-MostrarColaboradores(0, 10)
-CadastrarColaborador("Pedro", 2000.00, "Padrao")
-CadastrarColaborador("Ashlee", 2500.00, "Comissionado", 10.0)
-CadastrarColaborador("Paulo Cesar", 3500.00, "Padrao")
-MostrarColaboradores(0, 10)
+                lista_de_colaboradores["Tipo de Colaborador"].append("Por Produtividade")
+                lista_de_colaboradores["Salário Base"].append(col.salario_base)
+                lista_de_colaboradores["Percentual de Comissão"].append(0.00)
+                lista_de_colaboradores["Valor de Vendas"].append(0.00)
+                lista_de_colaboradores["Valor por Produção"].append(col.valor_por_unidade_produzida)
+                lista_de_colaboradores["Quantidade Produzida"].append(col.quantidade_produzida)
+                lista_de_colaboradores["Salário Total"].append(col.salario_base + salario_adicional)
+            case _:
+
+                lista_de_colaboradores["Tipo de Colaborador"].append("Padrão")
+                lista_de_colaboradores["Salário Base"].append(col.salario_base)
+                lista_de_colaboradores["Percentual de Comissão"].append(0.00)
+                lista_de_colaboradores["Valor de Vendas"].append(0.00)
+                lista_de_colaboradores["Valor por Produção"].append(0.00)
+                lista_de_colaboradores["Quantidade Produzida"].append(0)
+                lista_de_colaboradores["Salário Total"].append(col.salario_base)
+    
+    df = pd.DataFrame(lista_de_colaboradores)
+
+    df.to_excel(f"src/output/Lista de Colaboradores {inicio}-{inicio+qntd}.xlsx")
+
+CadastrarColaborador("Pedro", 2000.00, "padrao")
+CadastrarColaborador("Ashlee", 2500.00, "commisao", 10.0)
+CadastrarColaborador("Paulo Cesar", 3000.00, "padrao")
+MostrarColaboradores(0,3)
