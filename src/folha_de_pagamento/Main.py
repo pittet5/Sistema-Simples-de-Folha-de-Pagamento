@@ -35,7 +35,14 @@ def CadastrarColaborador(nome_col:str, salario_col:float, tipo_col:str = "padrao
                 novo_colaborador:Colaboradores.Colaborador = Colaboradores.Colaborador(0, nome_col, salario_col)
             else: novo_colaborador:Colaboradores.Colaborador = Colaboradores.Colaborador(Colaboradores.colaboradores[-1].matricula + 1, nome_col, salario_col)
 
-def MostrarColaboradores(inicio:int = 0, qntd:int = 500) -> None:
+def AlterarColaborador(matricula:int, novo_nome:str = "", novo_salario:float = 0.00, novo_tipo:str = "padrao",
+                       novo_percentual_comissao:float = 0.00, novo_valor_vendas:float = 0.00,
+                       novo_valor_por_producao:float = 0.00, nova_quantidade_produzida:int = 0):
+    
+    pass
+
+
+def MostrarColaboradores(nome_arquivo:str, inicio:int = 0, qntd:int = 500) -> None:
 
     lista_de_colaboradores:dict = {
         "Matrícula": [],
@@ -90,9 +97,6 @@ def MostrarColaboradores(inicio:int = 0, qntd:int = 500) -> None:
     
     df = pd.DataFrame(lista_de_colaboradores)
 
-    df.to_excel(f"src/output/Lista de Colaboradores {inicio}-{inicio+qntd}.xlsx")
+    df.to_excel(f"Sistema-Simples-de-Folha-de-Pagamento/src/output/{nome_arquivo}.xlsx")
 
-CadastrarColaborador("Pedro", 2000.00, "padrao")
-CadastrarColaborador("Ashlee", 2500.00, "commisao", 10.0)
-CadastrarColaborador("Paulo Cesar", 3000.00, "padrao")
-MostrarColaboradores(0,3)
+

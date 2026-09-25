@@ -30,7 +30,7 @@ class ColaboradorComissionado(Colaborador):
     #O percentual de comissão não poderá ser negativo.
     def __init__(self, matricula:int, nome:str, salario_base:float, percentual_comissao:float) -> None:
         
-        self. matricula = matricula
+        self.matricula = matricula
         self.nome = nome
         self.salario_base = salario_base
         self.percentual_comissao = percentual_comissao
@@ -47,7 +47,7 @@ class ColaboradorPorProducao(Colaborador):
     #O valor pago por unidade produzida não poderá ser negativo.
     def __init__(self, matricula:int, nome:str, salario_base:float, valor_por_unidade_produzida:float) -> None:
         
-        self. matricula = matricula
+        self.matricula = matricula
         self.nome = nome
         self.salario_base = salario_base
         self.valor_por_unidade_produzida = valor_por_unidade_produzida
