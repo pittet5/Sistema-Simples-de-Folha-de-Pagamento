@@ -28,6 +28,11 @@ class Colaborador:
 
         return self.salario_base
 
+    @classmethod
+    def mostrar_colaborador(self) -> float:
+
+        mostrar_colaborador(self.matricula)
+
 #3.2 Colaborador Comissionado
 #Recebe:
 #Salário base
@@ -49,6 +54,7 @@ class ColaboradorComissionado(Colaborador):
     def calcular_salario_total(self) -> float:
 
         return (self.salario_base + (self.valor_de_vendas * (self.percentual_comissao/100)))
+
 
 #3.3 Colaborador por Produção
 #Recebe:
@@ -72,7 +78,7 @@ class ColaboradorPorProducao(Colaborador):
 
         return (self.salario_base + (self.valor_por_unidade_produzida * self.quantidade_produzida))
 
-def CadastrarColaborador(nome_col:str, salario_col:float, tipo_col:str = "padrao", adicional:float = 0.0) -> bool:
+def cadastrar_colaborador(nome_col:str, salario_col:float, tipo_col:str = "padrao", adicional:float = 0.0) -> bool:
 
     #Checa se o nome eh valido
     if nome_col.strip() == "":
@@ -106,9 +112,9 @@ def CadastrarColaborador(nome_col:str, salario_col:float, tipo_col:str = "padrao
                 novo_colaborador:Colaborador = Colaborador(0, nome_col, salario_col)
             else: novo_colaborador:Colaborador = Colaborador(lista_de_colaboradores[-1].matricula + 1, nome_col, salario_col)
 
-def MostrarColaborador(col_matricula:int):
+def mostrar_colaborador(col_matricula:int):
     
-    col = EncontrarColaboradores(col_matricula, "")[0]
+    col = encontrar_colaborador(col_matricula, "")[0]
 
     match type(col):
         case ColaboradorComissionado():
@@ -119,7 +125,7 @@ def MostrarColaborador(col_matricula:int):
             print(f"Nome: {col.nome}\nMatrícula: {col.matricula}\nTipo: Produtividade\nSalário Base: {col.salario_base}\nSalário Total: {col.calcular_salario_total()}")
 
 
-def AlterarColaborador(matricula:int, novo_nome:str = "", novo_salario:float = 0.00, novo_tipo:str = "padrao",
+def alterar_colaborador(matricula:int, novo_nome:str = "", novo_salario:float = 0.00, novo_tipo:str = "padrao",
                        novo_percentual_comissao:float = 0.00, novo_valor_vendas:float = 0.00,
                        novo_valor_por_producao:float = 0.00, nova_quantidade_produzida:int = 0):
     
@@ -142,7 +148,7 @@ def AlterarColaborador(matricula:int, novo_nome:str = "", novo_salario:float = 0
                 if col.matricula == matricula:
                     col = colaborador_modificado
 
-def ExcluirColaborador(col_matricula:int) -> bool:
+def excluir_colaborador(col_matricula:int) -> bool:
 
     for col in lista_de_colaboradores:
         if col.matricula == col_matricula:
@@ -151,7 +157,7 @@ def ExcluirColaborador(col_matricula:int) -> bool:
     
     return False
 
-def EncontrarColaboradores(buscar_matricula:int, buscar_nome:str) -> array:
+def encontrar_colaborador(buscar_matricula:int, buscar_nome:str) -> array:
     
     lista_de_colaboradores_achados:array = []
 
