@@ -1,7 +1,21 @@
 import array
+import email_validator
 from enum import Enum
 
 lista_usuarios:array = []
+
+class Permissao(Enum):
+
+    CADASTRAR_COLABORADORES = 1
+    LER_COLABORADORES = 2
+    ALTERAR_COLABORADORES = 3
+    EXCLUIR_COLABORADORES = 4
+    CRIAR_USUARIOS = 5
+    LER_USUARIOS = 6
+    ALTERAR_USUARIOS = 7
+    EXCLUIR_USUARIOS = 8
+    ALTERAR_NOME_DOMINIO = 9
+    EXCLUIR_DOMINIO = 10
 
 class Usuario:
 
@@ -11,6 +25,8 @@ class Usuario:
         self.senha = senha
         self.permissoes = permissoes
 
+        lista_usuarios.append(self)
+    
     @classmethod
     def mudar_senha(self, senha_atual:str, nova_senha:str) -> bool:
 
@@ -31,7 +47,7 @@ class Usuario:
 
 class Administrador(Usuario):
 
-    def __init__(self, login:int, senha:str):
+    def __init__(self, login:str, senha:str):
 
         self.login = login
         self.senha = senha
@@ -40,7 +56,15 @@ class Administrador(Usuario):
         for perm in Permissao:
             self.permissoes.append(perm)
 
-def usuario_existe(login:int, senha:str) -> bool:
+def login_existe(login:str) -> bool:
+
+    for u in lista_usuarios:
+        if u.login == login:
+            return True
+    
+    return False
+
+def usuario_existe(login:str, senha:str) -> bool:
 
     for u in lista_usuarios:
         if u.login == login and u.senha == senha:
@@ -48,15 +72,10 @@ def usuario_existe(login:int, senha:str) -> bool:
 
     return False
 
-class Permissao(Enum):
+def copiar_permissoes(login:int) -> array:
 
-    CADASTRAR_COLABORADORES = 1
-    LER_COLABORADORES = 2
-    ALTERAR_COLABORADORES = 3
-    EXCLUIR_COLABORADORES = 4
-    CRIAR_USUARIOS = 5
-    LER_USUARIOS = 6
-    ALTERAR_USUARIOS = 7
-    EXCLUIR_USUARIOS = 8
-    ALTERAR_NOME_DOMINIO = 9
-    EXCLUIR_DOMINIO = 10
+    for u in lista_usuarios:
+        if u.login == login:
+            return u.permissoes
+    
+    return []

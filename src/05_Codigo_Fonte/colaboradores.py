@@ -20,7 +20,7 @@ class Colaborador:
         self.matricula = matricula
         self.nome = nome
         self.salario_base = salario_base
-
+        
         lista_de_colaboradores.append(self)
 
     @classmethod
