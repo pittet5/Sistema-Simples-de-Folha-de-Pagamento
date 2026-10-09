@@ -1,6 +1,8 @@
+import interface_usuario
+
 def main():
 
-    pass
+    interface_usuario.main()
 
 if __name__ == "__main__":
 

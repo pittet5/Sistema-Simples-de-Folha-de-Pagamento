@@ -55,3 +55,12 @@ def criar_novo_usuario_dominio(usuario_espelho:int, login_usuario:int, senha_usu
     
     novo_usuario = usuarios.Usuario(login_usuario, senha_usuario, usuarios.copiar_permissoe(usuario_espelho))
     return novo_usuario
+
+def fazer_login(login_usuario:str, senha_usuario:str) -> usuarios.Usuario:
+
+    if not usuarios.usuario_existe(login_usuario, senha_usuario):
+        return UsuarioNaoExisteErro
+
+    for usuario in usuarios.lista_usuarios:
+        if usuario.login == login_usuario and usuario.senha == senha_usuario:
+            return usuario

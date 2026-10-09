@@ -1,3 +1,5 @@
 {
-    "python-envs.defaultEnvManager": "ms-python.python:system"
+    "python.analysis.extraPaths": [
+        "./Sistema-Simples-de-Folha-de-Pagamento/src/05_Codigo_Fonte"
+    ]
 }
