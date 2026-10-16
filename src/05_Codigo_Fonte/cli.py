@@ -1,56 +1,76 @@
 import os
 import keyboard
+from enum import Enum
 
-def limpar() -> None:
+class PosicaoCursor(Enum):
 
-    os.system('cls||clear')
+    LINHA = 0
+    GRADE = 1
+    CONTINUO = 2
 
-def escreva(texto:str, texto_limpo=True) -> None:
+class CLI:
 
-    if texto_limpo:
-        limpar()
+    def __init__(self, cursor:PosicaoCursor = 0) -> None:
+        
+        self.tipo_cursor = cursor
+        self.posicao_cursor = -1
+        self.ultimo_texto = ''
     
-    print(texto)
+    def limpar() -> None:
 
-def opcoes(pergunta:str, lista_opcoes:set, toggle=False) -> str:
+        os.system('cls||clear')
 
-    opcao_atual: int = 0
- 
-    opcoes_texto = pergunta + "\n\n"
+    def escreva(self, texto:str, texto_limpo=True) -> None:
 
-    for indice, opcao in enumerate(lista_opcoes):
-        if indice == opcao_atual:
-            opcoes_texto += ">" + opcao + "\n"
+        if texto_limpo:
+            self.limpar()
+        
+        print(texto)
+        self.ultimo_texto = texto
+
+    def adicionar_cursor(self, linha:int = 0) -> str:
+
+        contar_linha = 0
+
+        if linha == contar_linha:
+            return ('>'+self.ultimo_texto)
         else:
-            opcoes_texto += opcao + "\n"
+            contar_linha += 1
 
-    opcoes_texto += "mova com as setas [:arrow_up:] e [:arrow_down:] e selecione com [Enter],ou cancele com [Esc]."
+        for char_pos, char in enumerate(self.ultimo_texto):
+            if char == '\n':
+                if linha == contar_linha:
+                    return (self.ultimo_texto[:char_pos+1]+'>'+self.ultimo_texto[char_pos+1:])
+                else:
+                    contar_linha += 1
 
-    escreva(opcoes_texto)
+    def remover_cursor(self) -> str:
 
-    while not keyboard.is_pressed('esc'):
+        for char_pos, char in enumerate(self.ultimo_texto):
+            if char == '>':
+                return (self.ultimo_texto[:char_pos]+self.ultimo_texto[char_pos+1:])
 
-        if keyboard.is_pressed('up'):
-            if opcao_atual == 0:
-                opcao_atual = len(lista_opcoes)-1
-            else:
-                opcao_atual -= 1
-                
-            escreva(opcoes_texto)
-            continue
-        
-        if keyboard.is_pressed('down'):
-            if opcao_atual == len(lista_opcoes)-1:
-                opcao_atual = 0
-            else:
-                opcao_atual += 1
-                
-            escreva(opcoes_texto)
-            continue
-        
-        if keyboard.is_pressed('enter'):
-            return lista_opcoes[opcao_atual]
+    def espere_por_entrada(entrada_esperada:list = []) -> str:
+
+        if len(entrada_esperada) <= 0:
+
+            return ''
+
+        else:
+
+            for entrada in entrada_esperada:
+
+                if keyboard.is_pressed(entrada):
+                    return entrada
+
+    def opcoes(pergunta:str, lista_opcoes:set, toggle=False) -> str:
+
+        opcao_atual: int = 0
+        texto_ajuda = "mova com as setas [:arrow_up:] e [:arrow_down:] e selecione com [Enter],ou cancele com [Esc]."
     
-    return ''
+        opcoes_texto = ""
 
-escreva(opcoes("Qual opção deseja?", ["opção 1", "opção 2", "opção 3"]))
+        for opcao in lista_opcoes:
+            opcoes_texto += "\n"+opcao
+
+        return ''
