@@ -2,7 +2,7 @@ import json
 import array
 import usuarios
 from cryptography.fernet import Fernet
-from email_validator import email_validator, EmailNotValidError
+from email_validator import validate_email, EmailNotValidError
 
 lista_dominios:dict = {}
 
@@ -22,13 +22,17 @@ class UsuarioJaExisteErro(Exception):
     """Usuario ja existe no sistema"""
     pass
 
+class SenhaNaoEhValidaErro(Exception):
+    """Senha ou usuario incorreto"""
+    pass
+
 def criar_novo_administrador(login:str, senha:str) -> usuarios.Administrador:
 
     if usuarios.login_existe(login):
         return EmailJaExisteErro
 
     try:
-        email_valido = email_validator(login)
+        email_valido = validate_email(login)
         novo_amdmin = usuarios.Administrador(login, senha)
         return novo_amdmin
     except EmailNotValidError:
@@ -37,6 +41,9 @@ def criar_novo_administrador(login:str, senha:str) -> usuarios.Administrador:
 def criar_novo_dominio(nome_dominio:str, admin_dominio:usuarios.Administrador) -> bool:
 
     if lista_dominios.get(nome_dominio) != None:
+        return False
+
+    if len(nome_dominio) <= 4:
         return False
 
     lista_dominios[nome_dominio] = {"Administrador": admin_dominio,
@@ -64,3 +71,5 @@ def fazer_login(login_usuario:str, senha_usuario:str) -> usuarios.Usuario:
     for usuario in usuarios.lista_usuarios:
         if usuario.login == login_usuario and usuario.senha == senha_usuario:
             return usuario
+
+    return SenhaNaoEhValidaErro

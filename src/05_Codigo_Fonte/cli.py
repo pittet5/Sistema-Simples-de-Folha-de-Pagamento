@@ -1,5 +1,6 @@
 import os
 import time
+from getpass import getpass
 import keyboard
 from enum import Enum
 
@@ -84,10 +85,10 @@ class CLI:
         menu_completo += self.gerar_opcoes(opcoes, opcao_atual)
 
         if pode_sair:
-            menu_completo += "Use as setas para mover e 'Enter' para confirmar ou 'Esc' para sair."
+            menu_completo += "\n\nUse as setas para mover e 'Enter' para confirmar ou 'Esc' para sair."
 
         else:
-            menu_completo += "Use as setas para mover e 'Enter' para confirmar."
+            menu_completo += "\n\nUse as setas para mover e 'Enter' para confirmar."
 
         self.escreva(menu_completo)
 
@@ -99,7 +100,7 @@ class CLI:
 
             if tecla.event_type == keyboard.KEY_DOWN:
                 match tecla.name:
-                    case 'escape':
+                    case 'esc':
                         if pode_sair:
                             return ''
                     case 'enter':
@@ -124,10 +125,10 @@ class CLI:
             menu_completo += self.gerar_opcoes(opcoes, opcao_atual)
 
             if pode_sair:
-                menu_completo += "Use as setas para mover e 'Enter' para confirmar ou 'Esc' para sair."
+                menu_completo += "\n\nUse as setas para mover e 'Enter' para confirmar ou 'Esc' para sair."
 
             else:
-                menu_completo += "Use as setas para mover e 'Enter' para confirmar."
+                menu_completo += "\n\nUse as setas para mover e 'Enter' para confirmar."
 
             self.escreva(menu_completo)
 
@@ -137,3 +138,82 @@ class CLI:
                 time.sleep(0.25)
             
             ultima_entrada_recebida = tecla.name
+
+    def instrucoes(self, lista_instrucoes:set, icone:str='') -> bool:
+
+        texto_instrucoes = ""
+        instrucao_atual = 0
+
+        if len(lista_instrucoes) <= 0:
+            return False
+
+        texto_instrucoes = lista_instrucoes[instrucao_atual]
+
+        if instrucao_atual == len(lista_instrucoes)-1:
+            texto_instrucoes += "\n\nPresione 'Enter' para confirmar."
+        else:
+            texto_instrucoes += "\n\nAvance com '>' ou retorne com '<'."
+
+        if instrucao_atual == 0:
+            texto_instrucoes += " Pressione 'Esc' para sair"
+
+        self.escreva(texto_instrucoes)
+
+        ultima_entrada_recebida = ''
+
+        while True:
+
+            tecla = keyboard.read_event()
+
+            if tecla.event_type == keyboard.KEY_DOWN:
+
+                if tecla.name == 'esc' and instrucao_atual == 0:
+                    return False
+
+                if tecla.name == 'enter' and instrucao_atual == len(lista_instrucoes)-1:
+                    input()
+                    return True
+
+                if tecla.name == 'right' and instrucao_atual != len(lista_instrucoes)-1:
+                    instrucao_atual += 1
+
+                if tecla.name == 'left' and instrucao_atual != 0:
+                    instrucao_atual -= 1
+
+            texto_instrucoes = lista_instrucoes[instrucao_atual]
+
+            if instrucao_atual == len(lista_instrucoes)-1:
+                texto_instrucoes += "\n\nPresione 'Enter' para confirmar."
+            else:
+                texto_instrucoes += "\n\nAvance com '>' ou retorne com '<'."
+
+            if instrucao_atual == 0:
+                texto_instrucoes += " Pressione 'Esc' para sair"
+
+            self.escreva(texto_instrucoes)
+            
+            if ultima_entrada_recebida == tecla.name:
+                time.sleep(0.1)
+            else:
+                time.sleep(0.25)
+            
+            ultima_entrada_recebida = tecla.name
+
+    def preencher_campo(self, nome_campo:str, oculto:bool = False) -> str:
+        
+        while keyboard._pressed_events:
+            time.sleep(0.05)
+
+        campo_preenchido:str = ""
+
+        while campo_preenchido.strip() == "":
+
+            if oculto:
+                campo_preenchido = getpass("\n"+nome_campo+"  ", echo_char="*")
+            else:
+                campo_preenchido = input("\n"+nome_campo+"  ")
+
+            if campo_preenchido.strip() != "":
+                return campo_preenchido
+
+            self.escreva(self.ultimo_texto)

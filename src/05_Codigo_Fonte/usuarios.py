@@ -52,6 +52,8 @@ class Administrador(Usuario):
         self.login = login
         self.senha = senha
         self.permissoes = []
+
+        lista_usuarios.append(self)
         
         for perm in Permissao:
             self.permissoes.append(perm)
