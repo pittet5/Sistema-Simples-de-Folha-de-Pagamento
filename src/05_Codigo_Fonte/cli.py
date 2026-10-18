@@ -1,4 +1,5 @@
 import os
+import time
 import keyboard
 from enum import Enum
 
@@ -16,7 +17,7 @@ class CLI:
         self.posicao_cursor = -1
         self.ultimo_texto = ''
     
-    def limpar() -> None:
+    def limpar(self) -> None:
 
         os.system('cls||clear')
 
@@ -28,19 +29,26 @@ class CLI:
         print(texto)
         self.ultimo_texto = texto
 
-    def adicionar_cursor(self, linha:int = 0) -> str:
+    def adicionar_cursor(self, texto:str, linha:int = 0) -> str:
+
+        texto_cursor = ''
+
+        if texto == '':
+            texto_cursor = self.ultimo_texto
+        else:
+            texto_cursor = texto
 
         contar_linha = 0
 
         if linha == contar_linha:
-            return ('>'+self.ultimo_texto)
+            return ('>'+texto_cursor)
         else:
             contar_linha += 1
 
-        for char_pos, char in enumerate(self.ultimo_texto):
+        for char_pos, char in enumerate(texto_cursor):
             if char == '\n':
                 if linha == contar_linha:
-                    return (self.ultimo_texto[:char_pos+1]+'>'+self.ultimo_texto[char_pos+1:])
+                    return (texto_cursor[:char_pos+1]+'>'+texto_cursor[char_pos+1:])
                 else:
                     contar_linha += 1
 
@@ -50,27 +58,82 @@ class CLI:
             if char == '>':
                 return (self.ultimo_texto[:char_pos]+self.ultimo_texto[char_pos+1:])
 
-    def espere_por_entrada(entrada_esperada:list = []) -> str:
-
-        if len(entrada_esperada) <= 0:
-
-            return ''
-
-        else:
-
-            for entrada in entrada_esperada:
-
-                if keyboard.is_pressed(entrada):
-                    return entrada
-
-    def opcoes(pergunta:str, lista_opcoes:set, toggle=False) -> str:
-
-        opcao_atual: int = 0
-        texto_ajuda = "mova com as setas [:arrow_up:] e [:arrow_down:] e selecione com [Enter],ou cancele com [Esc]."
+    def gerar_opcoes(self, lista_opcoes:set, opcao_atual:int = 0) -> str:
     
-        opcoes_texto = ""
+        opcoes_texto = "\n"
 
         for opcao in lista_opcoes:
             opcoes_texto += "\n"+opcao
 
-        return ''
+        opcoes_texto = self.adicionar_cursor(opcoes_texto, 2+opcao_atual)
+
+        return opcoes_texto
+
+    def menu(self, texto_menu:str, opcoes:set, icone:str = '', pode_sair:bool=True) -> str:
+
+        menu_completo = ""
+
+        menu_completo = texto_menu
+
+        for opcao in opcoes:
+            if type(opcao) is not str:
+                opcoes.discard(opcao)
+
+        opcao_atual = 0
+
+        menu_completo += self.gerar_opcoes(opcoes, opcao_atual)
+
+        if pode_sair:
+            menu_completo += "Use as setas para mover e 'Enter' para confirmar ou 'Esc' para sair."
+
+        else:
+            menu_completo += "Use as setas para mover e 'Enter' para confirmar."
+
+        self.escreva(menu_completo)
+
+        ultima_entrada_recebida = ''
+
+        while True:
+
+            tecla = keyboard.read_event()
+
+            if tecla.event_type == keyboard.KEY_DOWN:
+                match tecla.name:
+                    case 'escape':
+                        if pode_sair:
+                            return ''
+                    case 'enter':
+                        return opcoes[opcao_atual]
+                    case 'up':
+                        if opcao_atual == 0:
+                            opcao_atual = len(opcoes)-1
+                        else:
+                            opcao_atual -= 1
+                    case 'down':
+                        if opcao_atual == len(opcoes)-1:
+                            opcao_atual = 0
+                        else:
+                            opcao_atual += 1
+                    case _:
+                        continue
+
+            menu_completo = ""
+
+            menu_completo = texto_menu
+
+            menu_completo += self.gerar_opcoes(opcoes, opcao_atual)
+
+            if pode_sair:
+                menu_completo += "Use as setas para mover e 'Enter' para confirmar ou 'Esc' para sair."
+
+            else:
+                menu_completo += "Use as setas para mover e 'Enter' para confirmar."
+
+            self.escreva(menu_completo)
+
+            if ultima_entrada_recebida == tecla.name:
+                time.sleep(0.1)
+            else:
+                time.sleep(0.25)
+            
+            ultima_entrada_recebida = tecla.name
