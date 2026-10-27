@@ -3,7 +3,7 @@ import login
 from cli import CLI
 from folha_de_pagamento import GerarRelatorioDeFolhaDePagamento, GerarRelatorioResumido
 from usuarios import Usuario, Administrador, Permissao, possui_permissao, tipo_permissao
-from colaboradores import TipoColaborador, cadastrar_colaborador
+from colaboradores import Colaborador, ColaboradorComissionado, ColaboradorPorProducao, TipoColaborador, cadastrar_colaborador, mostrar_colaborador, encontrar_colaborador
 
 def main():
 
@@ -250,14 +250,91 @@ def tela_cadastro_colaborador(usuario:Usuario) -> None:
 
                  adicional_colaborador = cli_cadastro.preencher_campo("Adicional de Comissão (%)")
 
-                 novo_colaborador = cadastrar_colaborador(nome_colaborador, salario_colaborador, TipoColaborador.Comissionado, adicional_colaborador)
+                 novo_colaborador = cadastrar_colaborador(nome_colaborador, salario_colaborador, TipoColaborador.COMISSIONADO, adicional_colaborador)
 
             case "Por Produção":
                  cli_cadastro.escreva(f"Preencha os dados do novo colaborador.\n\nNome do Colaborador: {nome_colaborador}\nSalário do Colaborador: {salario_colaborador}\nTipo do Colaborador: {tipo_colaborador}")
 
                  adicional_colaborador = cli_cadastro.preencher_campo("Adicional por Produção")
 
-                 novo_colaborador = cadastrar_colaborador(nome_colaborador, salario_colaborador, TipoColaborador.Produtividade, adicional_colaborador)
+                 novo_colaborador = cadastrar_colaborador(nome_colaborador, salario_colaborador, TipoColaborador.PRODUTIVIDADE, adicional_colaborador)
+
+def tela_procura_colaborador(usuario:Usuario) -> None:
+
+    cli_procura = CLI()
+
+    opcao_busca = cli_procura.menu("", ["Procurar pelo Nome", "Procurar pela Matrícula", "Sair"])
+
+    while True:
+
+        match opcao_busca:
+            case 'Procurar pelo Nome':
+                
+                nome_colaborador = cli_procura.preencher_campo("Nome")
+
+                possiveis_colaboradores = encontrar_colaborador(-1, nome_colaborador)
+
+                colaboradores_formatados = ["Sair"]
+
+                for col in possiveis_colaboradores:
+                    colaboradores_formatados.append(f"{col.matricula} - {col.nome}")
+                
+                colaborador_selecionado = cli_procura.menu("Selecione o colaborador que deseja visualizar.", colaboradores_formatados)
+
+                if colaborador_selecionado == 'Sair':
+                    continue
+
+                tela_alteracao_colaborador(usuario, possiveis_colaboradores[colaboradores_formatados.index(colaborador_selecionado)])
+
+            case 'Procurar pela Nome':
+                pass
+            case 'Sair':
+                break
+
+def tela_alteracao_colaborador(usuario:Usuario, colaborador:Colaborador) -> None:
+
+    cli_alteracao = CLI()
+
+    confirmacao = cli_alteracao.menu(f"Este é o colaborador desejado?\n{mostrar_colaborador(colaborador.matricula)}", ["Sim", "Não"])
+
+    if confirmacao == "Não":
+        return
+    
+    lista_opcoes = []
+
+    for perm in Permissao:
+        if possui_permissao(usuario, perm):
+            match perm:
+                case Permissao.ALTERAR_COLABORADORES:
+                    lista_opcoes.append("Alterar dados do Colaborador")
+                case Permissao.EXCLUIR_COLABORADORES:
+                    lista_opcoes.append("Excluir Colaborador")
+    
+    lista_opcoes.append("Sair")
+
+    opcao_selecionada = cli_alteracao.menu("Selecione a opção.", lista_opcoes)
+
+    match opcao_selecionada:
+        case 'Alterar dados do Colaborador':
+
+            cli_alteracao.escreva("Nome")
+
+            novo_nome_col = cli_alteracao.preencher_campo(f"{colaborador.nome} ->")
+
+            cli_alteracao.escreva(f"{colaborador.nome} -> {novo_nome_col}\n\nSalário")
+
+            novo_salario_col = cli_alteracao.preencher_campo(f"{colaborador.salario_base} ->")
+            
+            cli_alteracao.escreva(f"{colaborador.nome} -> {novo_nome_col}\n{colaborador.salario_base} -> {novo_salario_col}\n\nTipo")
+
+            match type(colaborador):
+                case ColaboradorComissionado:
+
+                    novo_tipo_col = cli_alteracao.preencher_campo("Comissionado ->")
+
+                    cli_alteracao.escreva("Nome")
+
+                    novo_nome_col = cli_alteracao.preencher_campo(f"{colaborador.nome} ->")
 
 def tela_usuarios(usuario:Usuario) -> None:
 
