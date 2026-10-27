@@ -5,8 +5,15 @@
 #Tipo de Colaborador  
 
 import array
+from enum import Enum
 
 lista_de_colaboradores:array = []
+
+class TipoColaborador(Enum):
+
+    Padrao = 1
+    Comissionado = 2
+    Produtividade = 3
 
 #3.1 Colaborador Padrao
 #Recebe apenas o salario base cadastrado.
@@ -78,7 +85,7 @@ class ColaboradorPorProducao(Colaborador):
 
         return (self.salario_base + (self.valor_por_unidade_produzida * self.quantidade_produzida))
 
-def cadastrar_colaborador(nome_col:str, salario_col:float, tipo_col:str = "padrao", adicional:float = 0.0) -> bool:
+def cadastrar_colaborador(nome_col:str, salario_col:float, tipo_col:TipoColaborador = 1, adicional:float = 0.0) -> bool:
 
     #Checa se o nome eh valido
     if nome_col.strip() == "":
@@ -88,19 +95,19 @@ def cadastrar_colaborador(nome_col:str, salario_col:float, tipo_col:str = "padra
     if salario_col < 0.0:
         return False
 
-    match tipo_col.lower():
-        case "padrao":
+    match tipo_col:
+        case TipoColaborador.Padrao:
             if len(lista_de_colaboradores) < 1:
                 novo_colaborador:Colaborador = Colaborador(0, nome_col, salario_col)
             else: novo_colaborador:Colaborador = Colaborador(lista_de_colaboradores[-1].matricula + 1, nome_col, salario_col)
-        case "comissionado":
+        case TipoColaborador.Comissionado:
             if adicional < 0.0:
                 return False
             
             if len(lista_de_colaboradores) < 1:
                 novo_colaborador:ColaboradorComissionado = ColaboradorComissionado(0, nome_col, salario_col, adicional)
             else: novo_colaborador:ColaboradorComissionado = ColaboradorComissionado(lista_de_colaboradores[-1].matricula + 1, nome_col, salario_col, adicional)
-        case "produtividade":
+        case TipoColaborador.Produtividade:
             if adicional < 0.0:
                 return False
             
@@ -122,26 +129,26 @@ def mostrar_colaborador(col_matricula:int):
         case ColaboradorPorProducao():
             print(f"Nome: {col.nome}\nMatrícula: {col.matricula}\nTipo: Produtividade\nSalário Base: {col.salario_base}\nValor Por Unidade Produzida: {col.valor_por_unidade_produzida}\nQuantidade Produzia: {col.quantidade_produzida}\nSalário Total: {col.calcular_salario_total()}")
         case Colaborador:
-            print(f"Nome: {col.nome}\nMatrícula: {col.matricula}\nTipo: Produtividade\nSalário Base: {col.salario_base}\nSalário Total: {col.calcular_salario_total()}")
+            print(f"Nome: {col.nome}\nMatrícula: {col.matricula}\nTipo: Padrão\nSalário Base: {col.salario_base}\nSalário Total: {col.calcular_salario_total()}")
 
 
-def alterar_colaborador(matricula:int, novo_nome:str = "", novo_salario:float = 0.00, novo_tipo:str = "padrao",
+def alterar_colaborador(matricula:int, novo_nome:str = "", novo_salario:float = 0.00, novo_tipo:TipoColaborador = 1,
                        novo_percentual_comissao:float = 0.00, novo_valor_vendas:float = 0.00,
                        novo_valor_por_producao:float = 0.00, nova_quantidade_produzida:int = 0):
     
-    match novo_tipo.strip().lower():
-        case "padrao":
+    match novo_tipo:
+        case TipoColaborador.Padrao:
             colaborador_modificado:Colaborador = Colaborador(matricula, novo_nome, novo_salario)
             for col in lista_de_colaboradores:
                 if col.matricula == matricula:
                     col = colaborador_modificado
-        case "comissionado":
+        case TipoColaborador.Comissionado:
             colaborador_modificado:Colaborador = ColaboradorComissionado(matricula, novo_nome, novo_salario, novo_percentual_comissao)
             colaborador_modificado.valor_de_vendas = novo_valor_vendas
             for col in lista_de_colaboradores:
                 if col.matricula == matricula:
                     col = colaborador_modificado
-        case "produtividade":
+        case TipoColaborador.Produtividade:
             colaborador_modificado:Colaborador = ColaboradorPorProducao(matricula, novo_nome, novo_salario, novo_valor_por_producao)
             colaborador_modificado.quantidade_produzida = nova_quantidade_produzida
             for col in lista_de_colaboradores:

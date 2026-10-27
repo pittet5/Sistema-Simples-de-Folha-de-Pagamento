@@ -19,7 +19,7 @@ class Permissao(Enum):
 
 class Usuario:
 
-    def __init__(self, login:int, senha:str, permissoes:array):
+    def __init__(self, login:str, senha:str, permissoes:array):
 
         self.login = login
         self.senha = senha
@@ -39,11 +39,6 @@ class Usuario:
     def eh_senha_correta(self, senha_atual:str) -> bool:
 
         return True if self.senha == senha_atual else False
-
-    @classmethod
-    def possui_permissao(self, permissao:str) -> bool:
-
-        return True if self.permissoes.count(permissao) > 0 else False
 
 class Administrador(Usuario):
 
@@ -74,10 +69,31 @@ def usuario_existe(login:str, senha:str) -> bool:
 
     return False
 
-def copiar_permissoes(login:int) -> array:
+def possui_permissao(usuario:Usuario, permissao:Permissao) -> bool:
+
+    for perm in usuario.permissoes:
+        if perm == permissao:
+            return True
+
+    return False
+
+def copiar_permissoes(login:str) -> array:
 
     for u in lista_usuarios:
         if u.login == login:
             return u.permissoes
     
     return []
+
+def tipo_permissao(perm:Permissao) -> str:
+
+    if perm in range(1, 5):
+        return "colaborador"
+    
+    if perm in range(5, 9):
+        return "usuario"
+    
+    if perm in range(9, 11):
+        return "dominio"
+
+    return ''

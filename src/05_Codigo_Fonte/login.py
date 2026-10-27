@@ -4,7 +4,7 @@ import usuarios
 from cryptography.fernet import Fernet
 from email_validator import validate_email, EmailNotValidError
 
-lista_dominios:dict = {}
+lista_dominios:dict = {'Pedrolingo': {'Administrador': usuarios.Administrador("pedro@gmail.com", "batata25"), 'Usuarios': [], 'Colaboradores': []}}
 
 class EmailJaExisteErro(Exception):
     """Usuario com este email ja existe"""
@@ -24,6 +24,10 @@ class UsuarioJaExisteErro(Exception):
 
 class SenhaNaoEhValidaErro(Exception):
     """Senha ou usuario incorreto"""
+    pass
+
+class DominioNaoExisteErro(Exception):
+    """Dominio nao existe no sistema"""
     pass
 
 def criar_novo_administrador(login:str, senha:str) -> usuarios.Administrador:
@@ -47,12 +51,12 @@ def criar_novo_dominio(nome_dominio:str, admin_dominio:usuarios.Administrador) -
         return False
 
     lista_dominios[nome_dominio] = {"Administrador": admin_dominio,
-                                    "Usuarios": {},
-                                    "Colaboradores": {}}
+                                    "Usuarios": [],
+                                    "Colaboradores": []}
 
     return True
 
-def criar_novo_usuario_dominio(usuario_espelho:int, login_usuario:int, senha_usuario:str) -> usuarios.Usuario:
+def criar_novo_usuario_dominio(usuario_espelho:str, login_usuario:str, senha_usuario:str, dominio:str) -> usuarios.Usuario:
 
     if not usuarios.login_existe(usuario_espelho):
         return UsuarioNaoExisteErro
@@ -60,8 +64,23 @@ def criar_novo_usuario_dominio(usuario_espelho:int, login_usuario:int, senha_usu
     if usuarios.login_existe(login_usuario):
         return UsuarioJaExisteErro
     
-    novo_usuario = usuarios.Usuario(login_usuario, senha_usuario, usuarios.copiar_permissoe(usuario_espelho))
-    return novo_usuario
+    if lista_dominios.get(dominio) == None:
+        return DominioNaoExisteErro
+
+    for usuario in lista_dominios[dominio]['Usuarios']:
+        if usuario.login == usuario_espelho:
+
+            novo_usuario = usuarios.Usuario(login_usuario, senha_usuario, usuarios.copiar_permissoes(usuario_espelho))
+            lista_dominios[dominio]["Usuarios"].append(novo_usuario)
+            return novo_usuario
+
+    if lista_dominios[dominio]['Administrador'].login == usuario_espelho:
+        
+        novo_usuario = usuarios.Usuario(login_usuario, senha_usuario, usuarios.copiar_permissoes(usuario_espelho))
+        lista_dominios[dominio]["Usuarios"].append(novo_usuario)
+        return novo_usuario
+
+    return UsuarioNaoExisteErro
 
 def fazer_login(login_usuario:str, senha_usuario:str) -> usuarios.Usuario:
 
@@ -73,3 +92,30 @@ def fazer_login(login_usuario:str, senha_usuario:str) -> usuarios.Usuario:
             return usuario
 
     return SenhaNaoEhValidaErro
+
+def dominio_do_usuario(usuario:usuarios.Usuario) -> str:
+
+    for dom in lista_dominios:
+        for u in lista_dominios[dom]['Usuarios']:
+            if u == usuario:
+                return dom
+
+    return ''
+
+def dominio_do_administrador(admin:usuarios.Administrador) -> str:
+
+    for dom in lista_dominios:
+        if lista_dominios[dom]['Administrador'] == admin:
+            return dom
+
+    return ''
+
+def excluir_usuario(usuario:usuarios.Usuario) -> bool:
+
+    dominio_pertencente = dominio_do_usuario(usuario)
+
+    if dominio_pertencente == '':
+        return False
+
+    lista_dominios[dominio_pertencente][1].remove(usuario)
+    return True

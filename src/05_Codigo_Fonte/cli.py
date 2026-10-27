@@ -70,7 +70,7 @@ class CLI:
 
         return opcoes_texto
 
-    def menu(self, texto_menu:str, opcoes:set, icone:str = '', pode_sair:bool=True) -> str:
+    def menu(self, texto_menu:str, opcoes:set, icone:str = '', pode_sair:bool=True, toggle:bool=False) -> str:
 
         menu_completo = ""
 
@@ -193,9 +193,9 @@ class CLI:
             self.escreva(texto_instrucoes)
             
             if ultima_entrada_recebida == tecla.name:
-                time.sleep(0.1)
+                time.sleep(0.05)
             else:
-                time.sleep(0.25)
+                time.sleep(0.15)
             
             ultima_entrada_recebida = tecla.name
 
