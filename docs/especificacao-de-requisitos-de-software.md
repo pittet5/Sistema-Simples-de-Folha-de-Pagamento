@@ -4,12 +4,6 @@ Este documento especifica os requisitos do Simplei Gerencial, fornecendo aos des
 para o projeto e implementação, assim como para a realização dos testes e homologação do sistema.
 ## 1.2 Escopo
 Este documento descreve os requisitos funcionais e não-funcionais relacionados ao projeto Simplei Gerencial.
-## 1.3 Definições e Siglas
-* CLI - Interface de Linha de Comando. Meio pelo qual um programa pode ser executado em um prompt de comando.
-* IDE - Ambiente de Desenvolvimento Integrado. Software utilizado para escrever e depurar código.
-* PIP - Instalador de Pacotes Pip. Gerenciador padrão de bibliotecas Python
-* Classe - Molde para criar objetos em Python.
-* Git - Sistema de controle de versão.
 # 2 Descrição do Sistema
 Um sistema de folha de pagamento que permite o cadastro, gerenciamento e cálculo dos salários de colaboradores de diferentes categorias, gerando relatórios individuais e consolidados da folha de pagamento.
 # 3 Requisitos Funcionais
